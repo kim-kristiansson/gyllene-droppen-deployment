@@ -1,0 +1,70 @@
+services:
+  gyllenedroppen.api:
+    build:
+      context: ./dotnet/GylleneDroppen
+      dockerfile: GylleneDroppen.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DOTNET_RUNNING_IN_CONTAINER=true
+      - ConnectionStrings__DefaultConnection=${CONNECTIONSTRINGS__DEFAULTCONNECTION}
+      - JWTCONFIG__SECRETKEY=${JWTCONFIG__SECRETKEY}
+      - STRIPECONFIG__SECRETKEY=${STRIPECONFIG__SECRETKEY}
+      - EMAILACCOUNTSCONFIG__INFO__PASSWORD=${EMAILACCOUNTSCONFIG__INFO__PASSWORD}
+      - EMAILACCOUNTSCONFIG__NOREPLY__PASSWORD=${EMAILACCOUNTSCONFIG__NOREPLY__PASSWORD}
+    ports:
+      - "5000:8080"
+    depends_on:
+      - gyllenedroppen.database
+    networks:
+      - gyllenedroppen-network
+
+  gyllenedroppen.nextjs:
+    build:
+      context: ./nextjs
+      dockerfile: Dockerfile
+    environment:
+      - NEXT_PUBLIC_API_URL=http://gyllenedroppen.nginx/api
+    ports:
+      - "3000:3000"
+    networks:
+      - gyllenedroppen-network
+
+  gyllenedroppen.database:
+    image: postgres:latest
+    container_name: gyllenedroppen.database
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - gyllenedroppen-network
+
+  gyllenedroppen.cache:
+    image: redis:latest
+    container_name: gyllenedroppen.cache
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - gyllenedroppen-network
+
+  gyllenedroppen.nginx:
+    image: nginx:latest
+    container_name: gyllenedroppen.nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - gyllenedroppen.api
+      - gyllenedroppen.nextjs
+    networks:
+      - gyllenedroppen-network
+
+networks:
+  gyllenedroppen-network:
+    driver: bridge

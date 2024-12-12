@@ -1,0 +1,9 @@
+[submodule "dotnet/gyllene-droppen-dotnet"]
+	path = dotnet/gyllene-droppen-dotnet
+	url = https://github.com/kim-kristiansson/gyllene-droppen-dotnet.git
+[submodule "nextjs"]
+	path = nextjs
+	url = https://github.com/kim-kristiansson/gyllene-droppen-nextjs.git
+[submodule "dotnet"]
+	path = dotnet
+	url = https://github.com/kim-kristiansson/gyllene-droppen-dotnet.git
