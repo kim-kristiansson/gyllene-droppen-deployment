@@ -1,5 +1,6 @@
 services:
   gyllenedroppen.api:
+    image: kimkristiansson/gyllenedroppen.api:latest
     build:
       context: ./dotnet/GylleneDroppen
       dockerfile: GylleneDroppen.Api/Dockerfile
@@ -19,6 +20,7 @@ services:
       - gyllenedroppen-network
 
   gyllenedroppen.nextjs:
+    image: kimkristiansson/gyllenedroppen.nextjs:latest
     build:
       context: ./nextjs
       dockerfile: Dockerfile
